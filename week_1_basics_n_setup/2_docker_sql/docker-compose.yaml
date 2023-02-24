@@ -9,6 +9,9 @@ services:
       - "./ny_taxi_postgres_data:/var/lib/postgresql/data:rw"
     ports:
       - "5432:5432"
+    networks:
+        - pgnetwork
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -16,4 +19,23 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=root
     ports:
       - "8080:80"
-    
+    volumes:
+       - ./servers.json:/pgadmin4/servers.json # preconfigured servers/connections
+       - ./pgpass:/pgpass # passwords for the connections in this file
+       - "./pgadmin_conn_data:/var/lib/pgadmin:rw"
+    depends_on:
+       - "pgdatabase"
+    networks:
+      - pgnetwork
+
+volumes:
+  pgadmin_conn_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./pgadmin_conn_data
+
+networks:
+  pgnetwork:
+    external: true
