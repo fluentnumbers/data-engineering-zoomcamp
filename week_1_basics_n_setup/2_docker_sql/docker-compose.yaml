@@ -20,8 +20,8 @@ services:
     ports:
       - "8080:80"
     volumes:
-       - ./servers.json:/pgadmin4/servers.json # preconfigured servers/connections
-       - ./pgpass:/pgpass # passwords for the connections in this file
+       - "./servers.json:/pgadmin4/servers.json" # preconfigured servers/connections
+       - "./pgpass:/pgpass" # passwords for the connections in this file
        - "./pgadmin_conn_data:/var/lib/pgadmin:rw"
     depends_on:
        - "pgdatabase"
