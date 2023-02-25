@@ -1,0 +1,4 @@
+.ipynb_checkpoints/
+*.csv
+*.csv.gz
+dtc-de-333333-1ad2eaa43f1a.json
