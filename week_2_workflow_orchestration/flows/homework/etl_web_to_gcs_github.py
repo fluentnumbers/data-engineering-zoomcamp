@@ -5,6 +5,7 @@ from prefect_gcp.cloud_storage import GcsBucket
 from random import randint
 from prefect.filesystems import GitHub
 
+
 @task(retries=3)
 def fetch(dataset_url: str) -> pd.DataFrame:
     """Read taxi data from web into pandas DataFrame"""
@@ -46,12 +47,10 @@ def write_gcs(path: Path) -> None:
     return
 
 
-@flow(name=f"HW 2-1")
-def etl_web_to_gcs() -> None:
+@flow(name=f"HW 2")
+def etl_web_to_gcs(month: int = 11, year: int = 2020, color: str = "green") -> None:
     """The main ETL function"""
-    color = "green"
-    year = 2020
-    month = 11
+
     dataset_file = f"{color}_tripdata_{year}-{month:02}"
     dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}.csv.gz"
 
@@ -62,4 +61,7 @@ def etl_web_to_gcs() -> None:
 
 
 if __name__ == "__main__":
-    etl_web_to_gcs()
+    color = "green"
+    year = 2020
+    month = 11
+    etl_web_to_gcs(month=month, year=year, color=color)
