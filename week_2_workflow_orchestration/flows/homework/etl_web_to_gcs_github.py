@@ -1,4 +1,6 @@
 from pathlib import Path
+
+import numpy as np
 import pandas as pd
 from prefect import flow, task
 from prefect_gcp.cloud_storage import GcsBucket
@@ -25,6 +27,10 @@ def clean(df: pd.DataFrame) -> pd.DataFrame:
     except KeyError:
         df["lpep_pickup_datetime"] = pd.to_datetime(df["lpep_pickup_datetime"])
         df["lpep_dropoff_datetime"] = pd.to_datetime(df["lpep_dropoff_datetime"])
+
+    m = df.select_dtypes(np.number)
+    df[m.columns] = m.round().astype(float)
+
     print(df.head(2))
     print(f"columns: {df.dtypes}")
     print(f"rows: {len(df)}")
@@ -48,20 +54,24 @@ def write_gcs(path: Path) -> None:
 
 
 @flow(name=f"HW 2")
-def etl_web_to_gcs(month: int = 11, year: int = 2020, color: str = "green") -> None:
+def etl_web_to_gcs(months: list[int] = [1,2], year: int = 2020, color: str = "green") -> None:
     """The main ETL function"""
 
-    dataset_file = f"{color}_tripdata_{year}-{month:02}"
-    dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}.csv.gz"
+    total_rows = 0
+    for month in months:
+        dataset_file = f"{color}_tripdata_{year}-{month:02}"
+        dataset_url = f"https://github.com/DataTalksClub/nyc-tlc-data/releases/download/{color}/{dataset_file}.csv.gz"
 
-    df = fetch(dataset_url)
-    df_clean = clean(df)
-    path = write_local(df_clean, color, dataset_file)
-    write_gcs(path)
+        df = fetch(dataset_url)
+        df_clean = clean(df)
+        path = write_local(df_clean, color, dataset_file)
+        write_gcs(path)
+        rows = len(df_clean)
+        total_rows += rows
 
 
 if __name__ == "__main__":
     color = "green"
     year = 2020
-    month = 11
-    etl_web_to_gcs(month=month, year=year, color=color)
+    months = [11]
+    etl_web_to_gcs(months=months, year=year, color=color)
