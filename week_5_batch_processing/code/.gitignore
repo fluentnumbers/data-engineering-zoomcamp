@@ -1,0 +1,8 @@
+.ipynb_checkpoints/
+data/
+*.csv
+*.csv.gz
+pgadmin_conn_data
+zones
+tmp
+fhvhv

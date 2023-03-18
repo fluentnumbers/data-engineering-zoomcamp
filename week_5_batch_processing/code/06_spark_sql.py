@@ -1,6 +1,38 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+"""
+start spark master
+~/spark/spark-3.3.2-bin-hadoop3/sbin/start-master.sh
+
+# get link to your local spark master @ localhost:8080 ??
+export URL="spark://de-zoomcamp.europe-west1-b.c.dtc-de-333333.internal:7077"
+
+#start spark worker
+~/spark/spark-3.3.2-bin-hadoop3/sbin/start-workers.sh  ${URL}
+
+#execute python script on spark
+python 06_spark_sql.py --input_green=data/pq/green/2020/*/ --input_yellow=data/pq/yellow/2020/*/ --output=data/report-2020
+
+OR BETTER use spark-submit:
+spark-submit --master="${URL}" 06_spark_sql.py --input_green=data/pq/green/2021/*/ --input_yellow=data/pq/yellow/2021/*/ --output=data/report-2021
+"""
+
+"""
+Submit a spark-ob to GCP dataproc (after creating it and giving service account permissions)
+Copy the main python script to gcp: gsutil cp 06_spark_sql.py gs://dtc_data_lake_dtc-de-333333/code/06_spark_sql.py
+
+gcloud dataproc jobs submit pyspark \
+    --project=dtc-de-333333 \
+    --cluster=de-zoomcamp-cluster \
+    --region=europe-west6 \
+    gs://dtc_data_lake_dtc-de-333333/code/06_spark_sql.py \
+    -- \
+        --input_green=gs://dtc_data_lake_dtc-de-333333/pq/green/2020/*/ \
+        --input_yellow=gs://dtc_data_lake_dtc-de-333333/pq/yellow/2020/*/ \
+        --output=gs://dtc_data_lake_dtc-de-333333/report-2020
+"""
+
 import argparse
 
 import pyspark
